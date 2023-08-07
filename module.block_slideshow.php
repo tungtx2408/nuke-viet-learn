@@ -124,20 +124,14 @@ if (!nv_function_exists('nv_news_block_news')) {
 
             while (list($id, $catid, $publtime, $exptime, $title, $alias, $homeimgthumb, $homeimgfile, $hometext, $external_link) = $result->fetch(3)) {
                 $link = NV_BASE_SITEURL . 'index.php?' . NV_LANG_VARIABLE . '=' . NV_LANG_DATA . '&amp;' . NV_NAME_VARIABLE . '=' . $module . '&amp;' . NV_OP_VARIABLE . '=' . $module_array_cat[$catid]['alias'] . '/' . $alias . '-' . $id . $global_config['rewrite_exturl'];
-                if ($homeimgthumb == 1) {
-                    //image thumb
-                    $imgurl = NV_BASE_SITEURL . NV_FILES_DIR . '/' . $site_mods[$module]['module_upload'] . '/' . $homeimgfile;
-                } elseif ($homeimgthumb == 2) {
-                    //image file
-                    $imgurl = NV_BASE_SITEURL . NV_UPLOADS_DIR . '/' . $site_mods[$module]['module_upload'] . '/' . $homeimgfile;
-                } elseif ($homeimgthumb == 3) {
-                    //image url
-                    $imgurl = $homeimgfile;
-                } elseif (!empty($show_no_image)) {
-                    //no image
-                    $imgurl = NV_BASE_SITEURL . $show_no_image;
+                if ($row['homeimgfile'] != '' and ($imginfo = nv_is_image(NV_UPLOADS_REAL_DIR . '/' . $module_upload . '/' . $row['homeimgfile'])) != array()) {
+                    $row['imgsourcebig'] = NV_BASE_SITEURL . NV_UPLOADS_DIR . '/' . $module_upload . '/' . $row['homeimgfile'];
+                } elseif (nv_is_url($row['homeimgfile'])) {
+                    $row['imgsourcebig'] = $row['homeimgfile'];
+                } elseif (!empty($module_config[$module]['show_no_image'])) {
+                    $row['imgsourcebig'] = NV_BASE_SITEURL . $module_config[$module]['show_no_image'];
                 } else {
-                    $imgurl = '';
+                    $row['imgsourcebig'] = NV_BASE_SITEURL . 'themes/' . $global_config['site_theme'] . '/images/no_image.gif';
                 }
                 $array_block_news[] = [
                     'id' => $id,
